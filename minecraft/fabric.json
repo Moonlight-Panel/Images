@@ -1,0 +1,55 @@
+{
+    "Uuid": "fe199412-c3ce-4411-9f54-eff7a4a2390e",
+    "Name": "Minecraft Fabric",
+    "Description": "Fabric is a modular modding toolchain targeting Minecraft 1.14 and above, including snapshots.",
+    "ConfigFiles": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"enable-query\": \"true\",\r\n            \"server-port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+    "StopCommand": "stop",
+    "StartupDetection": ")! For help, type ",
+    "InstallScript": "#!/bin/bash\r\n\r\nmkdir -p /mnt/server\r\ncd /mnt/server\r\n\r\n# Enable snapshots\r\nif [ -z \"$MC_VERSION\" ] || [ \"$MC_VERSION\" == \"latest\" ]; then\r\n  MC_VERSION=$(curl -sSL https://meta.fabricmc.net/v2/versions/game | jq -r '.[] | select(.stable== true )|.version' | head -n1)\r\nelif [ \"$MC_VERSION\" == \"snapshot\" ]; then\r\n  MC_VERSION=$(curl -sSL https://meta.fabricmc.net/v2/versions/game | jq -r '.[] | select(.stable== false )|.version' | head -n1)\r\nfi\r\n\r\nif [ -z \"$FABRIC_VERSION\" ] || [ \"$FABRIC_VERSION\" == \"latest\" ]; then\r\n  FABRIC_VERSION=$(curl -sSL https://meta.fabricmc.net/v2/versions/installer | jq -r '.[0].version')\r\nfi\r\n\r\nif [ -z \"$LOADER_VERSION\" ] || [ \"$LOADER_VERSION\" == \"latest\" ]; then\r\n  LOADER_VERSION=$(curl -sSL https://meta.fabricmc.net/v2/versions/loader | jq -r '.[] | select(.stable== true )|.version' | head -n1)\r\nelif [ \"$LOADER_VERSION\" == \"snapshot\" ]; then\r\n  LOADER_VERSION=$(curl -sSL https://meta.fabricmc.net/v2/versions/loader | jq -r '.[] | select(.stable== false )|.version' | head -n1)\r\nfi\r\n\r\nwget -O fabric-installer.jar https://maven.fabricmc.net/net/fabricmc/fabric-installer/$FABRIC_VERSION/fabric-installer-$FABRIC_VERSION.jar\r\njava -jar fabric-installer.jar server -mcversion $MC_VERSION -loader $LOADER_VERSION -downloadMinecraft\r\n\r\nif [ ! -f server.properties ]; then\r\n    echo -e \"Downloading assets\"\r\n    curl -o server.properties https://raw.githubusercontent.com/Moonlight-Panel/Images/main/minecraft/files/server.properties\r\n    curl -o eula.txt https://raw.githubusercontent.com/Moonlight-Panel/Images/main/minecraft/files/eula.txt\r\n    curl -o server-icon.png https://raw.githubusercontent.com/Moonlight-Panel/Images/main/minecraft/files/server-icon.png\r\nfi\r\n\r\necho -e \"Install Complete\"",
+    "InstallDockerImage": "moonlightpanel/images:installerjava",
+    "InstallEntrypoint": "bash",
+    "Startup": "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}",
+    "Allocations": 1,
+    "DockerImages": [
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:minecraft8"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:minecraft11"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:minecraft16"
+        },
+        {
+            "Default": true,
+            "Name": "moonlightpanel/images:minecraft17"
+        }
+    ],
+    "Variables": [
+        {
+            "Key": "SERVER_JARFILE",
+            "DefaultValue": "fabric-server-launch.jar"
+        },
+        {
+            "Key": "MC_VERSION",
+            "DefaultValue": "latest"
+        },
+        {
+            "Key": "FABRIC_VERSION",
+            "DefaultValue": "latest"
+        },
+        {
+            "Key": "LOADER_VERSION",
+            "DefaultValue": "latest"
+        },
+        {
+            "Key": "J2S",
+            "DefaultValue": "0"
+        }
+    ],
+    "TagsJson": "[\"fabricversion\",\"cleanup\",\"join2start\"]",
+    "BackgroundImageUrl": ""
+}

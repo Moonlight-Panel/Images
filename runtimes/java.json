@@ -1,0 +1,51 @@
+{
+    "Uuid": "6c85a27c-cd97-4643-b789-491387d8cb01",
+    "Name": "Java Runtime",
+    "Description": "A runtime for jars",
+    "ConfigFiles": "{}",
+    "StopCommand": "^C",
+    "StartupDetection": "Starting",
+    "InstallScript": "# install script here",
+    "InstallDockerImage": "alpine:latest",
+    "InstallEntrypoint": "ash",
+    "Startup": "echo \"Starting\" && java -Xmx{{SERVER_MEMORY}}M -Dterminal.jline=false -Dterminal.ansi=true -jar {{JARFILE}}",
+    "Allocations": 1,
+    "DockerImages": [
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:java8"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:java11"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:java16"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:java17"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:java18"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:java19"
+        },
+        {
+            "Default": true,
+            "Name": "moonlightpanel/images:java20"
+        }
+    ],
+    "Variables": [
+        {
+            "Key": "JARFILE",
+            "DefaultValue": "app.jar"
+        }
+    ],
+    "TagsJson": "[\"javaversion\",\"javafile\"]",
+    "BackgroundImageUrl": ""
+}

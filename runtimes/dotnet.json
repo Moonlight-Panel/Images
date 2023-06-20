@@ -1,0 +1,35 @@
+{
+    "Uuid": "2251d0a1-baa4-4c99-877d-23f6ba222468",
+    "Name": "Dotnet Runtime",
+    "Description": "",
+    "ConfigFiles": "{}",
+    "StopCommand": "^C",
+    "StartupDetection": "",
+    "InstallScript": "echo \"Done\"",
+    "InstallDockerImage": "alpine:latest",
+    "InstallEntrypoint": "ash",
+    "Startup": "dotnet {{MAIN_DLL}}",
+    "Allocations": 1,
+    "DockerImages": [
+        {
+            "Default": true,
+            "Name": "endelonhosting/images:dotnet5_0"
+        },
+        {
+            "Default": false,
+            "Name": "endelonhosting/images:dotnet6_0"
+        },
+        {
+            "Default": false,
+            "Name": "endelonhosting/images:dotnetcore3_1"
+        }
+    ],
+    "Variables": [
+        {
+            "Key": "MAIN_DLL",
+            "DefaultValue": "MyProject.dll"
+        }
+    ],
+    "TagsJson": "[\"dotnetversion\",\"dotnetfile\"]",
+    "BackgroundImageUrl": ""
+}

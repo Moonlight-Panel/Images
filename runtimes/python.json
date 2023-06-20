@@ -1,0 +1,51 @@
+{
+    "Uuid": "59d133da-9534-4d23-9221-8db3d85e1d30",
+    "Name": "Python Runtime",
+    "Description": "Mit diesem Server kannst du eigene Python Programme ausführen wie Discord Bots und Python Webseiten",
+    "ConfigFiles": "{}",
+    "StopCommand": "^C",
+    "StartupDetection": "Python Version",
+    "InstallScript": "#! /bin/bash\r\n\r\necho \"Installation complete\"\r\nexit 0",
+    "InstallDockerImage": "alpine:latest",
+    "InstallEntrypoint": "ash",
+    "Startup": "if [[ -f /home/container/${REQUIREMENTS_FILE} ]]; then pip install -U --prefix .local -r ${REQUIREMENTS_FILE}; fi; /usr/local/bin/python /home/container/{{BOT_PY_FILE}}",
+    "Allocations": 1,
+    "DockerImages": [
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:python2_7"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:python3_7"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:python3_8"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:python3_9"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:python3_10"
+        },
+        {
+            "Default": true,
+            "Name": "moonlightpanel/images:python3_11"
+        }
+    ],
+    "Variables": [
+        {
+            "Key": "BOT_PY_FILE",
+            "DefaultValue": "bot.py"
+        },
+        {
+            "Key": "REQUIREMENTS_FILE",
+            "DefaultValue": "requirements.txt"
+        }
+    ],
+    "TagsJson": "[\"pythonversion\",\"pythonfile\"]",
+    "BackgroundImageUrl": ""
+}

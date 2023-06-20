@@ -1,0 +1,47 @@
+{
+    "Uuid": "c79b7051-9778-4015-b26d-d097c13a6214",
+    "Name": "Javascript Runtime",
+    "Description": "Mit diesem Server kannst du eigene Javascript Programme ausführen wie Discord Bots und Node.JS Webseiten",
+    "ConfigFiles": "{}",
+    "StopCommand": "^C",
+    "StartupDetection": "NodeJS Version",
+    "InstallScript": "#! /bin/bash\r\n\r\necho \"Installation complete\"\r\nexit 0",
+    "InstallDockerImage": "alpine:latest",
+    "InstallEntrypoint": "ash",
+    "Startup": "if [ -f /home/container/package.json ]; then /usr/local/bin/npm install; fi; /usr/local/bin/node /home/container/{{BOT_JS_FILE}}",
+    "Allocations": 1,
+    "DockerImages": [
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:nodejs12"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:nodejs14"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:nodejs16"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:nodejs17"
+        },
+        {
+            "Default": false,
+            "Name": "moonlightpanel/images:nodejs18"
+        },
+        {
+            "Default": true,
+            "Name": "moonlightpanel/images:nodejs19"
+        }
+    ],
+    "Variables": [
+        {
+            "Key": "BOT_JS_FILE",
+            "DefaultValue": "index.js"
+        }
+    ],
+    "TagsJson": "[\"javascriptversion\",\"javascriptfile\"]",
+    "BackgroundImageUrl": ""
+}

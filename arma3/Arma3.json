@@ -1,0 +1,111 @@
+{
+    "Uuid": "3b455d4c-dcbc-4ef4-ba0f-1c2cc307286b",
+    "Name": "Arma3",
+    "Description": "The Game",
+    "ConfigFiles": "{}",
+    "StopCommand": "^C",
+    "StartupDetection": "Host identity created",
+    "InstallScript": "# install script here\r\n#!/bin/bash\r\n\r\n## File: Pterodactyl Arma 3 Egg - egg-arma3.json\r\n## Author: David Wolfe (Red-Thirten)\r\n## Update by : FlashModz\r\n## Date: 2022/05/22\r\n## Update Date: 2023/11/15\r\n## License: MIT License\r\n## Image to install with is 'ghcr.io\\/parkervcp\\/installers:debian'\r\n# Install packages. Default packages below are skipped if using image noted above, thus speeding up the install process.\r\n\r\napt -y update\r\napt -y --no-install-recommends install curl lib32gcc-s1 ca-certificates\r\n# Check for valid Steam credentials to download Arma 3 with (requires valid Steam account)\r\nif [[ \"${STEAM_USER}\" == \"\" ]] || [[ \"${STEAM_USER}\" == \"anonymous\" ]] || [[ \"${STEAM_PASS}\" == \"\" ]]; then   \r\n   echo -e \"INSTALLATION ERROR: A valid REAL Steam account is required to download the Arma 3 Dedicated Server.\"  \r\n   echo -e \"(\\\"anonymous\\\" account cannot be used. Game ownership is not required.)\"  \r\n   exit 1\r\nfi\r\n   \r\n# Download and install SteamCMD\r\ncd /tmp\r\nmkdir -p /mnt/server/steamcmd /mnt/server/steamapps\r\ncurl -sSL -o steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz\r\ntar -xzvf steamcmd.tar.gz -C /mnt/server/steamcmd\r\ncd /mnt/server/steamcmd\r\n\r\n# SteamCMD fails otherwise for some reason, even running as root.\r\n# This is changed at the end of the install process anyways.\r\nchown -R root:root /mnt\r\nexport HOME=/mnt/server\r\n\r\n# Install game server using SteamCMD\r\n./steamcmd.sh +force_install_dir /mnt/server \"+login \"${STEAM_USER}\" \"${STEAM_PASS}\"\" +app_update ${STEAMCMD_APPID} ${STEAMCMD_EXTRA_FLAGS} validate +quit\r\n\r\n# Set up 32 and 64 bit libraries\r\nmkdir -p /mnt/server/.steam/sdk{32,64}\r\ncp -v linux32/steamclient.so /mnt/server/.steam/sdk32/steamclient.so\r\ncp -v linux64/steamclient.so /mnt/server/.steam/sdk64/steamclient.so\r\n\r\n# Arma 3 setup\r\ncd /mnt/server/\r\n[[ -f basic.cfg ]] || curl -sSLO ${BASIC_URL}/basic.cfg\r\n[[ -f server.cfg ]] || curl -sSLO ${BASIC_URL}/server.cfg\r\nchmod 644 basic.cfg server.cfg",
+    "InstallDockerImage": "ghcr.io/parkervcp/installers:debian",
+    "InstallEntrypoint": "/bin/bash",
+    "Startup": "./{{SERVER_BINARY}} -ip=0.0.0.0 -port={{SERVER_PORT}} -profiles=./serverprofile -bepath=./ -cfg=basic.cfg -config=server.cfg -mod=\"{{CLIENT_MODS}}\" -serverMod=\"{{SERVERMODS}}\" \"{{STARTUP_PARAMS}}\"",
+    "Allocations": 1,
+    "DockerImages": [
+      {
+        "Default": false,
+        "Name": "ghcr.io/parkervcp/games:arma3"
+      }
+    ],
+    "Variables": [
+      {
+        "Key": "STEAM_USER",
+        "DefaultValue": "your_steam_username"
+      },
+      {
+        "Key": "STEAM_PASS",
+        "DefaultValue": "your_steam_password"
+      },
+      {
+        "Key": "STEAMCMD_ATTEMPTS",
+        "DefaultValue": "3"
+      },
+      {
+        "Key": "SERVER_BINARY",
+        "DefaultValue": "arma3server_x64"
+      },
+      {
+        "Key": "STARTUP_PARAMS",
+        "DefaultValue": "-noLogs"
+      },
+      {
+        "Key": "MAX_PLAYERS",
+        "DefaultValue": "32"
+      },
+      {
+        "Key": "SERVER_PASSWORD",
+        "DefaultValue": ""
+      },
+      {
+        "Key": "UPDATE_SERVER",
+        "DefaultValue": "1"
+      },
+      {
+        "Key": "DISABLE_MOD_UPDATES",
+        "DefaultValue": "0"
+      },
+      {
+        "Key": "CDLC",
+        "DefaultValue": "0"
+      },
+      {
+        "Key": "MOD_FILE",
+        "DefaultValue": "modlist.html"
+      },
+      {
+        "Key": "MODIFICATIONS",
+        "DefaultValue": ""
+      },
+      {
+        "Key": "MODS_LOWERCASE",
+        "DefaultValue": "0"
+      },
+      {
+        "Key": "VALIDATE_SERVER",
+        "DefaultValue": "0"
+      },
+      {
+        "Key": "SERVERMODS",
+        "DefaultValue": ""
+      },
+      {
+        "Key": "OPTIONALMODS",
+        "DefaultValue": ""
+      },
+      {
+        "Key": "STEAMCMD_EXTRA_FLAGS",
+        "DefaultValue": ""
+      },
+      {
+        "Key": "HC_NUM",
+        "DefaultValue": "0"
+      },
+      {
+        "Key": "HC_HIDE",
+        "DefaultValue": "1"
+      },
+      {
+        "Key": "CLEAR_CACHE",
+        "DefaultValue": "0"
+      },
+      {
+        "Key": "STEAMCMD_APPID",
+        "DefaultValue": "233780"
+      },
+      {
+        "Key": "BASIC_URL",
+        "DefaultValue": "https://raw.githubusercontent.com/parkervcp/eggs/master/game_eggs/steamcmd_servers/arma/arma3/egg-arma3-config"
+      }
+    ],
+    "TagsJson": "[\"variable-editor\"]",
+    "BackgroundImageUrl": ""
+  }

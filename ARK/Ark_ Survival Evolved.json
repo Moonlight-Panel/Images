@@ -1,0 +1,71 @@
+{
+  "Uuid": "7201d0fa-7f04-4b92-b88f-4a2cdc1e9cb3",
+  "Name": "Ark: Survival Evolved",
+  "Description": "As a man or woman stranded, naked, freezing, and starving on the unforgiving shores of a mysterious island called ARK, use your skill and cunning to kill or tame and ride the plethora of leviathan dinosaurs and other primeval creatures roaming the land. Hunt, harvest resources, craft items, grow crops, research technologies, and build shelters to withstand the elements and store valuables, all while teaming up with (or preying upon) hundreds of other players to survive, dominate... and escape! — Gamepedia: ARK",
+  "ConfigFiles": "{}",
+  "StopCommand": ":q",
+  "StartupDetection": "Waiting commands for 127.0.0.1:",
+  "InstallScript": "#!/bin/bash\r\n# steamcmd Base Installation Script\r\n#\r\n# Server Files: /mnt/server\r\n# Image to install with is 'ubuntu:18.04'\r\napt -y update\r\napt -y --no-install-recommends --no-install-suggests install curl lib32gcc-s1 ca-certificates\r\n\r\n## just in case someone removed the defaults.\r\nif [ \"${STEAM_USER}\" == \"\" ]; then\r\n    STEAM_USER=anonymous\r\n    STEAM_PASS=\"\"\r\n    STEAM_AUTH=\"\"\r\nfi\r\n\r\n## download and install steamcmd\r\ncd /tmp\r\nmkdir -p /mnt/server/steamcmd\r\ncurl -sSL -o steamcmd.tar.gz https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz\r\ntar -xzvf steamcmd.tar.gz -C /mnt/server/steamcmd\r\n\r\nmkdir -p /mnt/server/Engine/Binaries/ThirdParty/SteamCMD/Linux\r\ntar -xzvf steamcmd.tar.gz -C /mnt/server/Engine/Binaries/ThirdParty/SteamCMD/Linux\r\nmkdir -p /mnt/server/steamapps # Fix steamcmd disk write error when this folder is missing\r\ncd /mnt/server/steamcmd\r\n\r\n# SteamCMD fails otherwise for some reason, even running as root.\r\n# This is changed at the end of the install process anyways.\r\nchown -R root:root /mnt\r\nexport HOME=/mnt/server\r\n\r\n## install game using steamcmd\r\n./steamcmd.sh +login ${STEAM_USER} ${STEAM_PASS} ${STEAM_AUTH} +force_install_dir /mnt/server +app_update ${SRCDS_APPID} ${EXTRA_FLAGS} +quit ## other flags may be needed depending on install. looking at you cs 1.6\r\n\r\n## set up 32 bit libraries\r\nmkdir -p /mnt/server/.steam/sdk32\r\ncp -v linux32/steamclient.so ../.steam/sdk32/steamclient.so\r\n\r\n## set up 64 bit libraries\r\nmkdir -p /mnt/server/.steam/sdk64\r\ncp -v linux64/steamclient.so ../.steam/sdk64/steamclient.so\r\n\r\n## create a symbolic link for loading mods\r\ncd /mnt/server/Engine/Binaries/ThirdParty/SteamCMD/Linux\r\nln -sf ../../../../../Steam/steamapps steamapps\r\ncd /mnt/server",
+  "InstallDockerImage": "ghcr.io/parkervcp/installers:debian",
+  "InstallEntrypoint": "bash",
+  "Startup": "rmv() { echo  \"stopping server\"; rcon -t rcon -a 127.0.0.1:${RCON_PORT} -p ${ARK_ADMIN_PASSWORD} saveworld &&rcon -t rcon -a 127.0.0.1:${RCON_PORT} -p ${ARK_ADMIN_PASSWORD} DoExit && wait ${ARK_PID}; echo \"Server Closed\"; exit; }; trap rmv 15 2; cd ShooterGame/Binaries/Linux && ./ShooterGameServer {{SERVER_MAP}}?listen?SessionName=\"{{SESSION_NAME}}\"?ServerPassword={{ARK_PASSWORD}}?ServerAdminPassword={{ARK_ADMIN_PASSWORD}}?Port={{SERVER_PORT}}?RCONPort={{RCON_PORT}}?QueryPort={{QUERY_PORT}}?RCONEnabled=True?MaxPlayers={{MAX_PLAYERS}}?GameModIds={{MOD_ID}}$( [ \"$BATTLE_EYE\" == \"1\" ] || printf %s ' -NoBattlEye' ) -server -automanagedmods {{ARGS}} -log & ARK_PID=$! ; until echo \"waiting for rcon connection...\"; (rcon -t rcon -a 127.0.0.1:${RCON_PORT} -p ${ARK_ADMIN_PASSWORD})<&0 & wait $!; do sleep 5; done",
+  "Allocations": 1,
+  "DockerImages": [
+    {
+      "Default": true,
+      "Name": "ghcr.io/parkervcp/games:source"
+    }
+  ],
+  "Variables": [
+    {
+      "Key": "ARK_PASSWORD",
+      "DefaultValue": ""
+    },
+    {
+      "Key": "ARK_ADMIN_PASSWORD",
+      "DefaultValue": "PleaseChangeMe"
+    },
+    {
+      "Key": "SERVER_MAP",
+      "DefaultValue": "TheIsland"
+    },
+    {
+      "Key": "SESSION_NAME",
+      "DefaultValue": "A Moonlight Hosted ARK Server"
+    },
+    {
+      "Key": "RCON_PORT",
+      "DefaultValue": "27020"
+    },
+    {
+      "Key": "QUERY_PORT",
+      "DefaultValue": "27015"
+    },
+    {
+      "Key": "AUTO_UPDATE",
+      "DefaultValue": "0"
+    },
+    {
+      "Key": "BATTLE_EYE",
+      "DefaultValue": "1"
+    },
+    {
+      "Key": "SRCDS_APPID",
+      "DefaultValue": "376030"
+    },
+    {
+      "Key": "ARGS",
+      "DefaultValue": ""
+    },
+    {
+      "Key": "MOD_ID",
+      "DefaultValue": ""
+    },
+    {
+      "Key": "MAX_PLAYERS",
+      "DefaultValue": "12"
+    }
+  ],
+  "TagsJson": "[\"Games\",\"Steam\",\"ARK\",\"NeedToUp2date\"]",
+  "BackgroundImageUrl": ""
+}

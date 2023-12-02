@@ -1,0 +1,55 @@
+{
+    "Uuid": "c53b1107-337b-4d25-b075-4e693242e4c1",
+    "Name": "TS-Custom",
+    "Description": "Description",
+    "ConfigFiles": "{\n    \"ts3server.ini\": {\n        \"parser\": \"ini\",\n        \"find\": {\n            \"default_voice_port\": \"{{server.build.default.port}}\",\n            \"voice_ip\": \"0.0.0.0, ::\",\n            \"filetransfer_port\": \"{{server.build.env.FILETRANSFER_PORT}}\",\n            \"filetransfer_ip\": \"0.0.0.0, ::\",\n            \"query_port\": \"{{server.build.env.QUERY_PORT}}\",\n            \"query_ip\": \"0.0.0.0, ::\",\n            \"logquerycommands\": \"{{server.build.env.LOG_QUERY_COMMANDS}}\",\n            \"license_accepted\": \"1\",\n            \"query_ssh_ip\": \"0.0.0.0, ::\",\n            \"query_ssh_port\": \"{{server.build.env.QUERY_SSH_PORT}}\",\n            \"query_protocols\": \"{{server.build.env.QUERY_PROTOCOLS}}\",\n            \"query_ssh_rsa_host_key\": \"{{server.build.env.QUERY_SSH_KEY}}\",\n            \"query_timeout\": \"{{server.build.env.QUERY_TIMEOUT}}\"\n        }\n    },\n    \"version_static.txt\": {\n        \"parser\": \"ini\",\n        \"find\": {\n            \"SERVER_VERSION\": \"{{server.build.env.SERVER_VERSION}}\"\n        }\n    }\n}",
+    "StopCommand": "^C",
+    "StartupDetection": "listening for query",
+    "InstallScript": "#!/bin/bash\r\n# TS3 Installation Script\r\n#\r\n# Server Files: /mnt/server\r\n\r\necho 'apt-get update ; installing tar and curl'\r\napt-get update\r\napt-get install -y tar curl bzip2\r\ncd /mnt/server || exit\r\nTSVERSION=$(curl https://raw.githubusercontent.com/jpylypiw/teamspeak-egg/master/tsversion)\r\necho \"latest ts3 version: $TSVERSION\"\r\necho 'installing...'\r\n#wget $(curl -s https://www.teamspeak.com/en/downloads/#server | grep -o 'https://files.teamspeak-services.com/releases/server/.*/teamspeak3-server_linux_amd64-.*.tar.bz2' | head -n1) -O ~/latest.tar.bz2\r\n#tar -xjf ./latest.tar.bz2 -C ~\r\ncurl https://files.teamspeak-services.com/releases/server/${TSVERSION}/teamspeak3-server_linux_amd64-${TSVERSION}.tar.bz2 | tar xj --strip-components=1\r\necho 'accepting license...'\r\necho '' > .ts3server_license_accepted\r\necho \"$TSVERSION\" > version_installed.txt\r\necho 'downloading startscript...'\r\ncurl -H 'Cache-Control: max-age=0' https://raw.githubusercontent.com/jpylypiw/teamspeak-egg/master/update.sh > update.sh\r\nchmod +x update.sh\r\necho \"\" > ts3server.ini\r\necho \"\" > version_static.txt\r\necho \"SERVER_VERSION=\" > version_static.txt\r\necho 'finished!'",
+    "InstallDockerImage": "ghcr.io/pterodactyl/installers:alpine",
+    "InstallEntrypoint": "ash",
+    "Startup": "./update.sh",
+    "Allocations": 1,
+    "DockerImages": [
+      {
+        "Default": false,
+        "Name": "quay.io/parkervcp/pterodactyl-images:base_debian"
+      }
+    ],
+    "Variables": [
+      {
+        "Key": "FILETRANSFER_PORT",
+        "DefaultValue": "30033"
+      },
+      {
+        "Key": "QUERY_PORT",
+        "DefaultValue": "10011"
+      },
+      {
+        "Key": "LOG_QUERY_COMMANDS",
+        "DefaultValue": "0"
+      },
+      {
+        "Key": "QUERY_SSH_PORT",
+        "DefaultValue": "10022"
+      },
+      {
+        "Key": "QUERY_PROTOCOLS",
+        "DefaultValue": "raw,ssh"
+      },
+      {
+        "Key": "QUERY_SSH_KEY",
+        "DefaultValue": "ssh_host_rsa_key"
+      },
+      {
+        "Key": "QUERY_TIMEOUT",
+        "DefaultValue": "300"
+      },
+      {
+        "Key": "SERVER_VERSION",
+        "DefaultValue": ""
+      }
+    ],
+    "TagsJson": "[\"voice\"]",
+    "BackgroundImageUrl": ""
+  }
